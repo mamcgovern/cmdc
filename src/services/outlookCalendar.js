@@ -3,8 +3,11 @@ import ICAL from "ical.js";
 const OUTLOOK_PROXY_URL =
   "http://localhost:3001/api/outlook-calendar";
 
-const toDateString = (date) => {
-  const year = date.getFullYear();
+const toDateString = (
+  date
+) => {
+  const year =
+    date.getFullYear();
 
   const month = String(
     date.getMonth() + 1
@@ -17,7 +20,9 @@ const toDateString = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-const toTimeString = (date) => {
+const toTimeString = (
+  date
+) => {
   const hour = String(
     date.getHours()
   ).padStart(2, "0");
@@ -32,16 +37,41 @@ const toTimeString = (date) => {
 const formatOutlookEvent = (
   event,
   startDate,
+  endDate = null,
   occurrenceId = ""
 ) => {
-  const jsDate =
+  const jsStartDate =
     startDate.toJSDate();
 
   const isAllDay =
     startDate.isDate;
 
+  let formattedEndDate =
+    null;
+
+  let formattedEndTime =
+    null;
+
+  if (
+    endDate &&
+    !isAllDay
+  ) {
+    const jsEndDate =
+      endDate.toJSDate();
+
+    formattedEndDate =
+      toDateString(
+        jsEndDate
+      );
+
+    formattedEndTime =
+      toTimeString(
+        jsEndDate
+      );
+  }
+
   return {
-    id: `outlook-${event.uid}-${occurrenceId || jsDate.getTime()}`,
+    id: `outlook-${event.uid}-${occurrenceId || jsStartDate.getTime()}`,
 
     externalId:
       event.uid,
@@ -51,12 +81,28 @@ const formatOutlookEvent = (
       "Untitled Event",
 
     date:
-      toDateString(jsDate),
+      toDateString(
+        jsStartDate
+      ),
 
     time:
       isAllDay
         ? null
-        : toTimeString(jsDate),
+        : toTimeString(
+            jsStartDate
+          ),
+
+    endDate:
+      formattedEndDate,
+
+    endTime:
+      formattedEndTime,
+
+    location:
+      event.location || "",
+
+    details:
+      event.description || "",
 
     source:
       "Outlook",
@@ -80,7 +126,6 @@ const expandRecurringEvent = (
     event.iterator();
 
   let next;
-
   let count = 0;
 
   const maxOccurrences =
@@ -113,6 +158,7 @@ const expandRecurringEvent = (
         formatOutlookEvent(
           details.item,
           details.startDate,
+          details.endDate,
           String(count)
         )
       );
@@ -141,7 +187,9 @@ export const getOutlookCalendarEvents =
       await response.text();
 
     const parsed =
-      ICAL.parse(icsText);
+      ICAL.parse(
+        icsText
+      );
 
     const calendar =
       new ICAL.Component(
@@ -187,8 +235,8 @@ export const getOutlookCalendarEvents =
       [];
 
     for (
-      const vevent of
-      vevents
+      const vevent
+      of vevents
     ) {
       const event =
         new ICAL.Event(
@@ -234,7 +282,8 @@ export const getOutlookCalendarEvents =
       outlookEvents.push(
         formatOutlookEvent(
           event,
-          start
+          start,
+          event.endDate
         )
       );
     }

@@ -54,6 +54,37 @@ export function GoogleCalendarProvider({
     }
   });
 
+  const getLocalDateString = (
+    date
+  ) => {
+    const year =
+      date.getFullYear();
+
+    const month = String(
+      date.getMonth() + 1
+    ).padStart(2, "0");
+
+    const day = String(
+      date.getDate()
+    ).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const getLocalTimeString = (
+    date
+  ) => {
+    const hour = String(
+      date.getHours()
+    ).padStart(2, "0");
+
+    const minute = String(
+      date.getMinutes()
+    ).padStart(2, "0");
+
+    return `${hour}:${minute}`;
+  };
+
   const formatGoogleEvent = (
     event,
     calendar
@@ -71,44 +102,62 @@ export function GoogleCalendarProvider({
 
     let eventDate;
     let eventTime = null;
+    let endDate = null;
+    let endTime = null;
 
     if (isAllDay) {
-      eventDate = startValue;
+      eventDate =
+        event.start.date;
+
+      /*
+       * Google represents an all-day
+       * event's end date as exclusive,
+       * so we don't display it as a
+       * normal ending date here.
+       */
     } else {
       const startDate =
-        new Date(startValue);
-
-      const year =
-        startDate.getFullYear();
-
-      const month = String(
-        startDate.getMonth() + 1
-      ).padStart(2, "0");
-
-      const day = String(
-        startDate.getDate()
-      ).padStart(2, "0");
+        new Date(
+          event.start.dateTime
+        );
 
       eventDate =
-        `${year}-${month}-${day}`;
-
-      const hour = String(
-        startDate.getHours()
-      ).padStart(2, "0");
-
-      const minute = String(
-        startDate.getMinutes()
-      ).padStart(2, "0");
+        getLocalDateString(
+          startDate
+        );
 
       eventTime =
-        `${hour}:${minute}`;
+        getLocalTimeString(
+          startDate
+        );
+
+      if (event.end?.dateTime) {
+        const endDateValue =
+          new Date(
+            event.end.dateTime
+          );
+
+        endDate =
+          getLocalDateString(
+            endDateValue
+          );
+
+        endTime =
+          getLocalTimeString(
+            endDateValue
+          );
+      }
     }
 
     return {
       id: `google-${calendar.id}-${event.id}`,
-      externalId: event.id,
 
-      calendarId: calendar.id,
+      externalId:
+        event.id,
+
+      calendarId:
+        calendar.id,
+
       calendarName:
         calendar.summary,
 
@@ -116,11 +165,29 @@ export function GoogleCalendarProvider({
         event.summary ||
         "Untitled Event",
 
-      date: eventDate,
-      time: eventTime,
+      date:
+        eventDate,
 
-      source: "Google",
-      readOnly: true,
+      time:
+        eventTime,
+
+      endDate,
+      endTime,
+
+      location:
+        event.location || "",
+
+      details:
+        event.description || "",
+
+      source:
+        "Google",
+
+      readOnly:
+        true,
+
+      externalUrl:
+        event.htmlLink || null,
     };
   };
 
@@ -132,7 +199,10 @@ export function GoogleCalendarProvider({
     ) => {
       const loadedEvents = [];
 
-      for (const calendarId of calendarIds) {
+      for (
+        const calendarId
+        of calendarIds
+      ) {
         const calendar =
           calendars.find(
             (item) =>
@@ -199,7 +269,9 @@ export function GoogleCalendarProvider({
           calendars
         );
 
-        setGoogleConnected(true);
+        setGoogleConnected(
+          true
+        );
 
         localStorage.setItem(
           "cmdc-google-connected",
@@ -209,10 +281,6 @@ export function GoogleCalendarProvider({
         let calendarsToLoad =
           selectedGoogleCalendars;
 
-        /*
-         * First-time connection:
-         * default to primary calendar.
-         */
         if (
           calendarsToLoad.length === 0
         ) {
@@ -255,7 +323,9 @@ export function GoogleCalendarProvider({
           false
         );
       } finally {
-        setGoogleLoading(false);
+        setGoogleLoading(
+          false
+        );
       }
     };
 
@@ -297,16 +367,17 @@ export function GoogleCalendarProvider({
       }
     };
 
-  const disconnectGoogle = () => {
-    setGoogleEvents([]);
-    setGoogleCalendars([]);
-    setGoogleAccessToken(null);
-    setGoogleConnected(false);
+  const disconnectGoogle =
+    () => {
+      setGoogleEvents([]);
+      setGoogleCalendars([]);
+      setGoogleAccessToken(null);
+      setGoogleConnected(false);
 
-    localStorage.removeItem(
-      "cmdc-google-connected"
-    );
-  };
+      localStorage.removeItem(
+        "cmdc-google-connected"
+      );
+    };
 
   const value = {
     googleEvents,
@@ -331,9 +402,10 @@ export function GoogleCalendarProvider({
 }
 
 export function useGoogleCalendar() {
-  const context = useContext(
-    GoogleCalendarContext
-  );
+  const context =
+    useContext(
+      GoogleCalendarContext
+    );
 
   if (!context) {
     throw new Error(
