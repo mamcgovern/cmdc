@@ -1,4 +1,12 @@
+import { NavLink, Route, Routes } from "react-router-dom";
 import "./App.css";
+
+import Dashboard from "./pages/Dashboard";
+import Tasks from "./pages/Tasks";
+import Calendar from "./pages/Calendar";
+import Projects from "./pages/Projects";
+import Notes from "./pages/Notes";
+import Settings from "./pages/Settings";
 
 function App() {
   return (
@@ -10,83 +18,74 @@ function App() {
         </div>
 
         <nav className="nav">
-          <a href="#" className="nav-item active">
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) =>
+              `nav-item ${isActive ? "active" : ""}`
+            }
+          >
             Dashboard
-          </a>
+          </NavLink>
 
-          <a href="#" className="nav-item">
+          <NavLink
+            to="/tasks"
+            className={({ isActive }) =>
+              `nav-item ${isActive ? "active" : ""}`
+            }
+          >
             Tasks
-          </a>
+          </NavLink>
 
-          <a href="#" className="nav-item">
+          <NavLink
+            to="/calendar"
+            className={({ isActive }) =>
+              `nav-item ${isActive ? "active" : ""}`
+            }
+          >
             Calendar
-          </a>
+          </NavLink>
 
-          <a href="#" className="nav-item">
+          <NavLink
+            to="/projects"
+            className={({ isActive }) =>
+              `nav-item ${isActive ? "active" : ""}`
+            }
+          >
             Projects
-          </a>
+          </NavLink>
 
-          <a href="#" className="nav-item">
+          <NavLink
+            to="/notes"
+            className={({ isActive }) =>
+              `nav-item ${isActive ? "active" : ""}`
+            }
+          >
             Notes
-          </a>
+          </NavLink>
         </nav>
 
         <div className="sidebar-footer">
-          <a href="#" className="nav-item">
+          <NavLink
+            to="/settings"
+            className={({ isActive }) =>
+              `nav-item ${isActive ? "active" : ""}`
+            }
+          >
             Settings
-          </a>
+          </NavLink>
         </div>
       </aside>
 
       <main className="main">
-        <header className="page-header">
-          <div>
-            <p className="eyebrow">COMMAND CENTER</p>
-            <h1>Good morning.</h1>
-            <p className="date">
-              {new Date().toLocaleDateString("en-US", {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-          </div>
-        </header>
-
-        <section className="dashboard-grid">
-          <div className="dashboard-card">
-            <div className="card-header">
-              <h2>Today</h2>
-              <span>0 tasks</span>
-            </div>
-
-            <p className="empty-state">Nothing on your list yet.</p>
-          </div>
-
-          <div className="dashboard-card">
-            <div className="card-header">
-              <h2>Weather</h2>
-            </div>
-
-            <p className="empty-state">Weather coming soon.</p>
-          </div>
-
-          <div className="dashboard-card">
-            <div className="card-header">
-              <h2>Upcoming</h2>
-            </div>
-
-            <p className="empty-state">Your calendar will appear here.</p>
-          </div>
-
-          <div className="dashboard-card">
-            <div className="card-header">
-              <h2>Quick Notes</h2>
-            </div>
-
-            <p className="empty-state">No notes yet.</p>
-          </div>
-        </section>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/notes" element={<Notes />} />
+          <Route path="/settings" element={<Settings />} />
+        </Routes>
       </main>
     </div>
   );
