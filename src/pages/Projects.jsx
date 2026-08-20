@@ -18,6 +18,8 @@ import {
 
 import { db } from "../services/firebase";
 
+import { useNavigate } from "react-router-dom";
+
 const PROJECT_COLORS = [
   {
     name: "Cardinal",
@@ -60,21 +62,35 @@ const PROJECT_STATUSES = [
   },
 ];
 
-const NEW_CATEGORY_VALUE = "__new__";
+const NEW_CATEGORY_VALUE =
+  "__new__";
 
 function Projects() {
-  const [projects, setProjects] = useState([]);
+  const navigate = useNavigate();
+  const [
+    projects,
+    setProjects,
+  ] = useState([]);
 
-  const [modalOpen, setModalOpen] =
-    useState(false);
+  const [
+    tasks,
+    setTasks,
+  ] = useState([]);
+
+  const [
+    modalOpen,
+    setModalOpen,
+  ] = useState(false);
 
   const [
     editingProjectId,
     setEditingProjectId,
   ] = useState(null);
 
-  const [name, setName] =
-    useState("");
+  const [
+    name,
+    setName,
+  ] = useState("");
 
   const [
     description,
@@ -91,16 +107,22 @@ function Projects() {
     setNewCategory,
   ] = useState("");
 
-  const [status, setStatus] =
-    useState("planning");
+  const [
+    status,
+    setStatus,
+  ] = useState("planning");
 
-  const [dueDate, setDueDate] =
-    useState("");
+  const [
+    dueDate,
+    setDueDate,
+  ] = useState("");
 
-  const [color, setColor] =
-    useState(
-      PROJECT_COLORS[0].value
-    );
+  const [
+    color,
+    setColor,
+  ] = useState(
+    PROJECT_COLORS[0].value
+  );
 
   const [
     categoryFilter,
@@ -133,7 +155,45 @@ function Projects() {
               (projectDoc) => ({
                 id:
                   projectDoc.id,
+
                 ...projectDoc.data(),
+              })
+            )
+          );
+        }
+      );
+
+    return unsubscribe;
+  }, []);
+
+  /*
+   * LOAD TASKS
+   */
+
+  useEffect(() => {
+    const tasksQuery =
+      query(
+        collection(
+          db,
+          "tasks"
+        ),
+        orderBy(
+          "createdAt",
+          "desc"
+        )
+      );
+
+    const unsubscribe =
+      onSnapshot(
+        tasksQuery,
+        (snapshot) => {
+          setTasks(
+            snapshot.docs.map(
+              (taskDoc) => ({
+                id:
+                  taskDoc.id,
+
+                ...taskDoc.data(),
               })
             )
           );
@@ -151,8 +211,9 @@ function Projects() {
     useMemo(() => {
       const values =
         projects
-          .map((project) =>
-            project.category?.trim()
+          .map(
+            (project) =>
+              project.category?.trim()
           )
           .filter(Boolean);
 
@@ -166,7 +227,8 @@ function Projects() {
   const filteredProjects =
     useMemo(() => {
       if (
-        categoryFilter === "all"
+        categoryFilter ===
+        "all"
       ) {
         return projects;
       }
@@ -192,7 +254,67 @@ function Projects() {
     ]);
 
   /*
-   * HELPERS
+   * PROJECT TASK HELPERS
+   */
+
+  const getProjectTasks =
+    (projectId) =>
+      tasks.filter(
+        (task) =>
+          task.projectId ===
+          projectId
+      );
+
+  const taskIsComplete =
+    (task) => {
+      if (
+        task.completed === true
+      ) {
+        return true;
+      }
+
+      return (
+        task.status === "done"
+      );
+    };
+
+  const getProjectStats =
+    (projectId) => {
+      const projectTasks =
+        getProjectTasks(
+          projectId
+        );
+
+      const total =
+        projectTasks.length;
+
+      const completed =
+        projectTasks.filter(
+          taskIsComplete
+        ).length;
+
+      const open =
+        total - completed;
+
+      const progress =
+        total === 0
+          ? 0
+          : Math.round(
+            (completed /
+              total) *
+            100
+          );
+
+      return {
+        total,
+        completed,
+        open,
+        progress,
+      };
+    };
+
+  /*
+   * FORM HELPERS
    */
 
   const resetForm = () => {
@@ -209,84 +331,80 @@ function Projects() {
       PROJECT_COLORS[0].value
     );
 
-    setEditingProjectId(null);
-  };
-
-  const openCreateModal = () => {
-    resetForm();
-    setModalOpen(true);
-  };
-
-  const openEditModal = (
-    project
-  ) => {
     setEditingProjectId(
-      project.id
+      null
     );
-
-    setName(
-      project.name || ""
-    );
-
-    setDescription(
-      project.description || ""
-    );
-
-    const projectCategory =
-      project.category?.trim() ||
-      "";
-
-    /*
-     * If the project's category
-     * already exists, select it.
-     *
-     * Otherwise treat it as a
-     * custom/new category.
-     */
-    if (
-      !projectCategory
-    ) {
-      setSelectedCategory("");
-      setNewCategory("");
-    } else if (
-      categories.includes(
-        projectCategory
-      )
-    ) {
-      setSelectedCategory(
-        projectCategory
-      );
-
-      setNewCategory("");
-    } else {
-      setSelectedCategory(
-        NEW_CATEGORY_VALUE
-      );
-
-      setNewCategory(
-        projectCategory
-      );
-    }
-
-    setStatus(
-      project.status ||
-        "planning"
-    );
-
-    setDueDate(
-      project.dueDate || ""
-    );
-
-    setColor(
-      project.color ||
-        PROJECT_COLORS[0].value
-    );
-
-    setModalOpen(true);
   };
+
+  const openCreateModal =
+    () => {
+      resetForm();
+
+      setModalOpen(true);
+    };
+
+  const openEditModal =
+    (project) => {
+      setEditingProjectId(
+        project.id
+      );
+
+      setName(
+        project.name || ""
+      );
+
+      setDescription(
+        project.description ||
+        ""
+      );
+
+      const projectCategory =
+        project.category?.trim() ||
+        "";
+
+      if (!projectCategory) {
+        setSelectedCategory("");
+        setNewCategory("");
+      } else if (
+        categories.includes(
+          projectCategory
+        )
+      ) {
+        setSelectedCategory(
+          projectCategory
+        );
+
+        setNewCategory("");
+      } else {
+        setSelectedCategory(
+          NEW_CATEGORY_VALUE
+        );
+
+        setNewCategory(
+          projectCategory
+        );
+      }
+
+      setStatus(
+        project.status ||
+        "planning"
+      );
+
+      setDueDate(
+        project.dueDate || ""
+      );
+
+      setColor(
+        project.color ||
+        PROJECT_COLORS[0].value
+      );
+
+      setModalOpen(true);
+    };
 
   const closeModal = () => {
     setModalOpen(false);
+
     resetForm();
   };
 
@@ -371,10 +489,24 @@ function Projects() {
 
   const handleDelete =
     async (project) => {
-      const confirmed =
-        window.confirm(
-          `Delete "${project.name}"? This will permanently remove the project.`
+      const stats =
+        getProjectStats(
+          project.id
         );
+
+      let message =
+        `Delete "${project.name}"?`;
+
+      if (stats.total > 0) {
+        message +=
+          `\n\nThis project has ${stats.total} task${stats.total === 1
+            ? ""
+            : "s"
+          }. The tasks will not be deleted, but they will no longer have a valid project.`;
+      }
+
+      const confirmed =
+        window.confirm(message);
 
       if (!confirmed) {
         return;
@@ -390,7 +522,7 @@ function Projects() {
     };
 
   /*
-   * COUNTS
+   * PROJECT COUNTS
    */
 
   const activeProjects =
@@ -419,42 +551,41 @@ function Projects() {
    * FORMATTERS
    */
 
-  const getStatusLabel = (
-    statusValue
-  ) =>
-    PROJECT_STATUSES.find(
-      (item) =>
-        item.value ===
-        statusValue
-    )?.label || "Planning";
+  const getStatusLabel =
+    (statusValue) =>
+      PROJECT_STATUSES.find(
+        (item) =>
+          item.value ===
+          statusValue
+      )?.label ||
+      "Planning";
 
-  const formatDueDate = (
-    dateString
-  ) => {
-    if (!dateString) {
-      return "No due date";
-    }
-
-    const [
-      year,
-      month,
-      day,
-    ] =
-      dateString.split("-");
-
-    return new Date(
-      Number(year),
-      Number(month) - 1,
-      Number(day)
-    ).toLocaleDateString(
-      "en-US",
-      {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
+  const formatDueDate =
+    (dateString) => {
+      if (!dateString) {
+        return "No due date";
       }
-    );
-  };
+
+      const [
+        year,
+        month,
+        day,
+      ] =
+        dateString.split("-");
+
+      return new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day)
+      ).toLocaleDateString(
+        "en-US",
+        {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }
+      );
+    };
 
   return (
     <>
@@ -522,59 +653,64 @@ function Projects() {
         </div>
       </section>
 
-      {projects.length > 0 && (
-        <section className="projects-toolbar">
-          <div className="projects-category-filter">
-            <span className="projects-filter-label">
-              Category
+      {projects.length >
+        0 && (
+          <section className="projects-toolbar">
+            <div className="projects-category-filter">
+              <span className="projects-filter-label">
+                Category
+              </span>
+
+              <select
+                value={
+                  categoryFilter
+                }
+                onChange={(
+                  event
+                ) =>
+                  setCategoryFilter(
+                    event.target.value
+                  )
+                }
+              >
+                <option value="all">
+                  All Categories
+                </option>
+
+                {categories.map(
+                  (
+                    categoryName
+                  ) => (
+                    <option
+                      key={
+                        categoryName
+                      }
+                      value={
+                        categoryName
+                      }
+                    >
+                      {categoryName}
+                    </option>
+                  )
+                )}
+
+                <option value="uncategorized">
+                  Uncategorized
+                </option>
+              </select>
+            </div>
+
+            <span className="projects-filter-count">
+              {
+                filteredProjects.length
+              }{" "}
+              {filteredProjects.length ===
+                1
+                ? "project"
+                : "projects"}
             </span>
-
-            <select
-              value={
-                categoryFilter
-              }
-              onChange={(event) =>
-                setCategoryFilter(
-                  event.target.value
-                )
-              }
-            >
-              <option value="all">
-                All Categories
-              </option>
-
-              {categories.map(
-                (categoryName) => (
-                  <option
-                    key={
-                      categoryName
-                    }
-                    value={
-                      categoryName
-                    }
-                  >
-                    {categoryName}
-                  </option>
-                )
-              )}
-
-              <option value="uncategorized">
-                Uncategorized
-              </option>
-            </select>
-          </div>
-
-          <span className="projects-filter-count">
-            {
-              filteredProjects.length
-            }{" "}
-            {filteredProjects.length ===
-            1
-              ? "project"
-              : "projects"}
-          </span>
-        </section>
-      )}
+          </section>
+        )}
 
       {projects.length === 0 ? (
         <section className="projects-empty">
@@ -623,138 +759,168 @@ function Projects() {
       ) : (
         <section className="projects-grid">
           {filteredProjects.map(
-            (project) => (
-              <article
-                key={
+            (project) => {
+              const stats =
+                getProjectStats(
                   project.id
-                }
-                className="project-card"
-                style={{
-                  "--project-color":
-                    project.color ||
-                    PROJECT_COLORS[0]
-                      .value,
-                }}
-              >
-                <div className="project-card-accent" />
+                );
 
-                <div className="project-card-header">
-                  <div className="project-card-title-wrap">
-                    <span className="project-color-dot" />
+              return (
+                <article
+                  key={project.id}
+                  className="project-card project-card--clickable"
+                  style={{
+                    "--project-color":
+                      project.color ||
+                      PROJECT_COLORS[0].value,
+                  }}
+                  onClick={() =>
+                    navigate(
+                      `/projects/${project.id}`
+                    )
+                  }
+                  onKeyDown={(event) => {
+                    if (
+                      event.key === "Enter" ||
+                      event.key === " "
+                    ) {
+                      event.preventDefault();
 
-                    <div>
-                      {project.category && (
-                        <span className="project-category">
-                          {
-                            project.category
-                          }
-                        </span>
-                      )}
+                      navigate(
+                        `/projects/${project.id}`
+                      );
+                    }
+                  }}
+                  role="link"
+                  tabIndex={0}
+                >
+                  <div className="project-card-accent" />
 
-                      <h2>
-                        {
-                          project.name
-                        }
-                      </h2>
+                  <div className="project-card-header">
+                    <div className="project-card-title-wrap">
+                      <span className="project-color-dot" />
 
-                      <span
-                        className={`project-status project-status--${
-                          project.status ||
-                          "planning"
-                        }`}
-                      >
-                        {getStatusLabel(
-                          project.status
+                      <div>
+                        {project.category && (
+                          <span className="project-category">
+                            {
+                              project.category
+                            }
+                          </span>
                         )}
-                      </span>
+
+                        <h2>
+                          {
+                            project.name
+                          }
+                        </h2>
+
+                        <span
+                          className={`project-status project-status--${project.status ||
+                            "planning"
+                            }`}
+                        >
+                          {getStatusLabel(
+                            project.status
+                          )}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="project-card-menu">
+                      <button
+                        type="button"
+                        className="project-card-menu-button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+
+                          openEditModal(project);
+                        }}
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        type="button"
+                        className="project-card-menu-button project-card-menu-button--delete"
+                        onClick={(event) => {
+                          event.stopPropagation();
+
+                          handleDelete(project);
+                        }}
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
 
-                  <div className="project-card-menu">
-                    <button
-                      type="button"
-                      className="project-card-menu-button"
-                      onClick={() =>
-                        openEditModal(
-                          project
-                        )
+                  {project.description ? (
+                    <p className="project-description">
+                      {
+                        project.description
                       }
-                    >
-                      Edit
-                    </button>
+                    </p>
+                  ) : (
+                    <p className="project-description project-description--empty">
+                      No description
+                      added.
+                    </p>
+                  )}
 
-                    <button
-                      type="button"
-                      className="project-card-menu-button project-card-menu-button--delete"
-                      onClick={() =>
-                        handleDelete(
-                          project
-                        )
-                      }
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
+                  <div className="project-card-footer">
+                    <div>
+                      <span className="project-meta-label">
+                        Due
+                      </span>
 
-                {project.description ? (
-                  <p className="project-description">
-                    {
-                      project.description
-                    }
-                  </p>
-                ) : (
-                  <p className="project-description project-description--empty">
-                    No description added.
-                  </p>
-                )}
+                      <strong>
+                        {formatDueDate(
+                          project.dueDate
+                        )}
+                      </strong>
+                    </div>
 
-                <div className="project-card-footer">
-                  <div>
-                    <span className="project-meta-label">
-                      Due
-                    </span>
+                    <div>
+                      <span className="project-meta-label">
+                        Tasks
+                      </span>
 
-                    <strong>
-                      {formatDueDate(
-                        project.dueDate
-                      )}
-                    </strong>
+                      <strong>
+                        {stats.open}{" "}
+                        open
+                      </strong>
+                    </div>
                   </div>
 
-                  <div>
-                    <span className="project-meta-label">
-                      Tasks
-                    </span>
+                  <div className="project-progress">
+                    <div className="project-progress-header">
+                      <span>
+                        {stats.total ===
+                          0
+                          ? "No tasks yet"
+                          : `${stats.completed} of ${stats.total} complete`}
+                      </span>
 
-                    <strong>
-                      0 open
-                    </strong>
+                      <strong>
+                        {
+                          stats.progress
+                        }
+                        %
+                      </strong>
+                    </div>
+
+                    <div className="project-progress-track">
+                      <div
+                        className="project-progress-fill"
+                        style={{
+                          width: `${stats.progress}%`,
+                        }}
+                      />
+                    </div>
                   </div>
-                </div>
-
-                <div className="project-progress">
-                  <div className="project-progress-header">
-                    <span>
-                      Progress
-                    </span>
-
-                    <strong>
-                      0%
-                    </strong>
-                  </div>
-
-                  <div className="project-progress-track">
-                    <div
-                      className="project-progress-fill"
-                      style={{
-                        width: "0%",
-                      }}
-                    />
-                  </div>
-                </div>
-              </article>
-            )
+                </article>
+              );
+            }
           )}
         </section>
       )}
@@ -762,7 +928,9 @@ function Projects() {
       {modalOpen && (
         <div
           className="project-modal-backdrop"
-          onMouseDown={(event) => {
+          onMouseDown={(
+            event
+          ) => {
             if (
               event.target ===
               event.currentTarget
@@ -810,7 +978,9 @@ function Projects() {
                 <input
                   type="text"
                   value={name}
-                  onChange={(event) =>
+                  onChange={(
+                    event
+                  ) =>
                     setName(
                       event.target.value
                     )
@@ -827,7 +997,9 @@ function Projects() {
                   value={
                     selectedCategory
                   }
-                  onChange={(event) => {
+                  onChange={(
+                    event
+                  ) => {
                     const value =
                       event.target.value;
 
@@ -839,7 +1011,9 @@ function Projects() {
                       value !==
                       NEW_CATEGORY_VALUE
                     ) {
-                      setNewCategory("");
+                      setNewCategory(
+                        ""
+                      );
                     }
                   }}
                 >
@@ -848,7 +1022,9 @@ function Projects() {
                   </option>
 
                   {categories.map(
-                    (categoryName) => (
+                    (
+                      categoryName
+                    ) => (
                       <option
                         key={
                           categoryName
@@ -857,7 +1033,9 @@ function Projects() {
                           categoryName
                         }
                       >
-                        {categoryName}
+                        {
+                          categoryName
+                        }
                       </option>
                     )
                   )}
@@ -874,24 +1052,26 @@ function Projects() {
 
               {selectedCategory ===
                 NEW_CATEGORY_VALUE && (
-                <label className="project-new-category-field">
-                  New Category Name
+                  <label className="project-new-category-field">
+                    New Category Name
 
-                  <input
-                    type="text"
-                    value={
-                      newCategory
-                    }
-                    onChange={(event) =>
-                      setNewCategory(
-                        event.target.value
-                      )
-                    }
-                    placeholder="Example: LTI Review"
-                    autoFocus
-                  />
-                </label>
-              )}
+                    <input
+                      type="text"
+                      value={
+                        newCategory
+                      }
+                      onChange={(
+                        event
+                      ) =>
+                        setNewCategory(
+                          event.target.value
+                        )
+                      }
+                      placeholder="Example: LTI Review"
+                      autoFocus
+                    />
+                  </label>
+                )}
 
               <label>
                 Description
@@ -900,7 +1080,9 @@ function Projects() {
                   value={
                     description
                   }
-                  onChange={(event) =>
+                  onChange={(
+                    event
+                  ) =>
                     setDescription(
                       event.target.value
                     )
@@ -916,7 +1098,9 @@ function Projects() {
 
                   <select
                     value={status}
-                    onChange={(event) =>
+                    onChange={(
+                      event
+                    ) =>
                       setStatus(
                         event.target.value
                       )
@@ -951,7 +1135,9 @@ function Projects() {
                     value={
                       dueDate
                     }
-                    onChange={(event) =>
+                    onChange={(
+                      event
+                    ) =>
                       setDueDate(
                         event.target.value
                       )
@@ -975,12 +1161,11 @@ function Projects() {
                           colorOption.value
                         }
                         type="button"
-                        className={`project-color-option ${
-                          color ===
+                        className={`project-color-option ${color ===
                           colorOption.value
-                            ? "project-color-option--selected"
-                            : ""
-                        }`}
+                          ? "project-color-option--selected"
+                          : ""
+                          }`}
                         style={{
                           "--option-color":
                             colorOption.value,

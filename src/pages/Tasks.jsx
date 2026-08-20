@@ -276,7 +276,7 @@ function Tasks() {
               <option value="">No project</option>
 
               {projects
-                .filter((project) => project.status !== "completed")
+                .filter((project) => project.status !== "complete")
                 .map((project) => (
                   <option key={project.id} value={project.id}>
                     {project.name}
@@ -432,9 +432,8 @@ function Tasks() {
                 return (
                   <div
                     key={task.id}
-                    className={`task-item ${
-                      task.completed ? "task-item--complete" : ""
-                    }`}
+                    className={`task-item ${task.completed ? "task-item--complete" : ""
+                      }`}
                   >
                     <button
                       type="button"
