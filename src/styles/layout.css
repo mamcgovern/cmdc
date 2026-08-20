@@ -1,0 +1,143 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  background: var(--background);
+  color: var(--text);
+}
+
+.sidebar {
+  width: 240px;
+  min-height: 100vh;
+  padding: 32px 20px 24px;
+  background: var(--sidebar);
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  padding: 0 12px 36px;
+}
+
+.brand-name {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 6px;
+}
+
+.brand-subtitle {
+  margin-top: 4px;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--sidebar-muted);
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-item {
+  display: block;
+  padding: 12px 14px;
+  border-radius: 8px;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  font-size: 14px;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.nav-item:hover {
+  background: var(--sidebar-hover);
+  color: white;
+}
+
+.nav-item.active {
+  background: var(--sidebar-active);
+  color: white;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 48px;
+}
+
+.page-header {
+  margin-bottom: 36px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 600;
+}
+
+.date {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 24px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+/* ISU Color Theme */
+
+[data-theme="color"] .brand-name {
+  color: #f1be48;
+}
+
+[data-theme="color"] .brand-subtitle {
+  color: #ffffff;
+}
+
+[data-theme="color"] .nav-item {
+  color: #ffffff;
+}
+
+[data-theme="color"] .nav-item:hover {
+  background: var(--sidebar-hover);
+  color: #ffffff;
+}
+
+[data-theme="color"] .nav-item.active {
+  background: #f1be48;
+  color: #524727;
+}
+
+[data-theme="color"] .nav-item.active:hover {
+  background: #f1be48;
+  color: #524727;
+}
+
+/* Responsive */
+
+@media (max-width: 850px) {
+  .main {
+    padding: 32px;
+  }
+}

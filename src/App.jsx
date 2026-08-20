@@ -1,5 +1,4 @@
 import { NavLink, Route, Routes } from "react-router-dom";
-import "./App.css";
 
 import Dashboard from "./pages/Dashboard";
 import Tasks from "./pages/Tasks";
@@ -7,6 +6,7 @@ import Calendar from "./pages/Calendar";
 import Projects from "./pages/Projects";
 import Notes from "./pages/Notes";
 import Settings from "./pages/Settings";
+import ProjectDetails from "./pages/ProjectDetails";
 
 function App() {
   return (
@@ -83,6 +83,7 @@ function App() {
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:projectId" element={<ProjectDetails />} />
           <Route path="/notes" element={<Notes />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>

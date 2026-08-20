@@ -1,0 +1,150 @@
+.settings-section {
+  max-width: 1000px;
+}
+
+.settings-card {
+  padding: 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.settings-card-header h2 {
+  margin: 0;
+}
+
+.settings-card-header p {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.theme-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.theme-option {
+  padding: 10px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.theme-option:hover {
+  transform: translateY(-2px);
+}
+
+.theme-option--active {
+  border-color: var(--accent);
+}
+
+.theme-preview {
+  height: 130px;
+  display: flex;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.theme-preview-sidebar {
+  width: 30%;
+}
+
+.theme-preview-main {
+  flex: 1;
+  padding: 16px;
+}
+
+.theme-preview-line {
+  width: 60%;
+  height: 8px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+
+.theme-preview-card {
+  width: 100%;
+  height: 55px;
+  border-radius: 6px;
+}
+
+.theme-preview--light {
+  background: #f5f6f8;
+}
+
+.theme-preview--light .theme-preview-sidebar {
+  background: #1d232b;
+}
+
+.theme-preview--light .theme-preview-line {
+  background: #525b66;
+}
+
+.theme-preview--light .theme-preview-card {
+  background: white;
+  border: 1px solid #e4e7eb;
+}
+
+.theme-preview--dark {
+  background: #11151a;
+}
+
+.theme-preview--dark .theme-preview-sidebar {
+  background: #0c0f13;
+}
+
+.theme-preview--dark .theme-preview-line {
+  background: #d8dde3;
+}
+
+.theme-preview--dark .theme-preview-card {
+  background: #1b2027;
+  border: 1px solid #303842;
+}
+
+.theme-preview--color {
+  background: #f6f4ed;
+}
+
+.theme-preview--color .theme-preview-sidebar {
+  background: #524727;
+}
+
+.theme-preview--color .theme-preview-line {
+  background: #c8102e;
+}
+
+.theme-preview--color .theme-preview-card {
+  background: #ffffff;
+  border: 2px solid #f1be48;
+}
+
+.theme-option-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 4px 4px;
+}
+
+.theme-option-info strong {
+  font-size: 14px;
+}
+
+.theme-option-info span {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+@media (max-width: 800px) {
+  .theme-options {
+    grid-template-columns: 1fr;
+  }
+}

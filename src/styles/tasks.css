@@ -1,0 +1,269 @@
+.task-layout {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.task-form,
+.task-list-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.task-form h2,
+.task-list-card h2 {
+  margin-top: 0;
+}
+
+.task-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.task-form-header h2,
+.task-form-header h3 {
+  margin: 0;
+}
+
+.task-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.task-form input,
+.task-form select {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--input-background);
+  color: var(--text);
+}
+
+.task-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.task-list {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--divider);
+}
+
+.task-item:last-child {
+  border-bottom: none;
+}
+
+.task-check {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--input-background);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.task-item--complete .task-check {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+
+.task-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.task-item--complete .task-title {
+  color: var(--text-faint);
+  text-decoration: line-through;
+}
+
+.task-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 5px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.priority,
+.task-project,
+.status-select {
+  border-radius: 999px;
+}
+
+.priority {
+  padding: 3px 7px;
+  text-transform: capitalize;
+}
+
+.priority--low { background: var(--low-bg); }
+.priority--medium { background: var(--medium-bg); }
+.priority--high { background: var(--high-bg); }
+
+.task-project {
+  padding: 3px 7px;
+  background: var(--project-bg);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.task-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-select {
+  border: none;
+  padding: 4px 8px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.status-select--todo { background: var(--todo-bg); }
+.status-select--in-progress { background: var(--progress-bg); }
+.status-select--done { background: var(--done-bg); }
+
+.task-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.task-views {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.task-view {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-secondary);
+  padding: 7px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.task-view:hover {
+  background: var(--surface-hover);
+}
+
+.task-view.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.task-filters {
+  display: flex;
+  gap: 8px;
+}
+
+.task-filters select {
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--input-background);
+  color: var(--text);
+  font-size: 12px;
+}
+
+.task-list-header {
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--divider);
+}
+
+@media (max-width: 900px) {
+  .task-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .task-toolbar {
+    align-items: stretch;
+  }
+
+  .task-filters {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .task-filters select {
+    flex: 1;
+    min-width: 140px;
+  }
+}
+
+/* ISU Color Theme Overrides */
+
+[data-theme="color"] .priority--low {
+  background: #cac7a7;
+  color: #524727;
+}
+
+[data-theme="color"] .priority--medium {
+  background: #f1be48;
+  color: #524727;
+}
+
+[data-theme="color"] .priority--high {
+  background: #c8102e;
+  color: #ffffff;
+}
+
+[data-theme="color"] .status-select--todo {
+  background: #cac7a7;
+  color: #524727;
+}
+
+[data-theme="color"] .status-select--in-progress {
+  background: #f1be48;
+  color: #524727;
+}
+
+[data-theme="color"] .status-select--done {
+  background: #9b945f;
+  color: #ffffff;
+}

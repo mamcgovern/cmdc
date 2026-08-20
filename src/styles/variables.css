@@ -1,0 +1,112 @@
+:root {
+  --background: #f5f6f8;
+  --surface: #ffffff;
+  --surface-secondary: #f3f5f7;
+  --surface-hover: #eef1f4;
+
+  --sidebar: #1d232b;
+  --sidebar-hover: #29313b;
+  --sidebar-active: #343e4a;
+  --sidebar-text: #b9c0c9;
+  --sidebar-muted: #9ca5b1;
+
+  --text: #20242a;
+  --text-secondary: #717b87;
+  --text-muted: #8a929c;
+  --text-faint: #9aa1aa;
+
+  --border: #e4e7eb;
+  --border-strong: #d8dde3;
+  --divider: #eceff2;
+
+  --accent: #1d232b;
+  --accent-hover: #343e4a;
+  --accent-text: #ffffff;
+
+  --input-background: #ffffff;
+  --focus: #343e4a;
+
+  --danger: #9a5050;
+  --link: #354252;
+
+  --low-bg: #eef4ee;
+  --medium-bg: #f5f1e7;
+  --high-bg: #f7e9e9;
+  --todo-bg: #edf0f3;
+  --progress-bg: #e8eef7;
+  --done-bg: #e7f1e8;
+  --project-bg: #edf0f5;
+
+  --shadow: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="dark"] {
+  --background: #11151a;
+  --surface: #1b2027;
+  --surface-secondary: #232a32;
+  --surface-hover: #2a323c;
+
+  --sidebar: #0c0f13;
+  --sidebar-hover: #1c222a;
+  --sidebar-active: #29313b;
+  --sidebar-text: #c0c7d0;
+  --sidebar-muted: #87919e;
+
+  --text: #f2f4f6;
+  --text-secondary: #b3bbc5;
+  --text-muted: #89929e;
+  --text-faint: #77818d;
+
+  --border: #303842;
+  --border-strong: #3b4551;
+  --divider: #2b333c;
+
+  --accent: #d9dee5;
+  --accent-hover: #ffffff;
+  --accent-text: #171b20;
+
+  --input-background: #222830;
+  --focus: #aeb8c4;
+
+  --danger: #e09a9a;
+  --link: #b9c9da;
+
+  --low-bg: #26382d;
+  --medium-bg: #3b3526;
+  --high-bg: #422c2f;
+  --todo-bg: #303740;
+  --progress-bg: #29384a;
+  --done-bg: #293b2d;
+  --project-bg: #2c3540;
+
+  --shadow: rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="color"] {
+  --background: #f6f4ed;
+  --surface: #ffffff;
+  --surface-secondary: #f1eee4;
+
+  /* Cardinal sidebar */
+  --sidebar: #c8102e;
+  --sidebar-hover: #a90d27;
+  --sidebar-active: #8f0b23;
+
+  --text: #2d2a24;
+  --text-secondary: #6f6857;
+  --text-muted: #8e8777;
+
+  --border: #cac7a7;
+
+  --accent: #c8102e;
+  --accent-hover: #a80d27;
+  --accent-text: #ffffff;
+
+  --input-background: #ffffff;
+
+  --shadow: rgba(82, 71, 39, 0.1);
+
+  --gold: #f1be48;
+  --olive: #9b945f;
+  --tan: #cac7a7;
+}

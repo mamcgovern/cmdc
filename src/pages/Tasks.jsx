@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   addDoc,
   collection,
@@ -14,13 +14,20 @@ import { db } from "../services/firebase";
 
 function Tasks() {
   const [tasks, setTasks] = useState([]);
+  const [projects, setProjects] = useState([]);
 
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [priority, setPriority] = useState("medium");
   const [status, setStatus] = useState("todo");
+  const [projectId, setProjectId] = useState("");
 
   const [editingTaskId, setEditingTaskId] = useState(null);
+
+  const [view, setView] = useState("all");
+  const [priorityFilter, setPriorityFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [projectFilter, setProjectFilter] = useState("all");
 
   useEffect(() => {
     const tasksQuery = query(
@@ -40,11 +47,30 @@ function Tasks() {
     return unsubscribe;
   }, []);
 
+  useEffect(() => {
+    const projectsQuery = query(
+      collection(db, "projects"),
+      orderBy("createdAt", "desc")
+    );
+
+    const unsubscribe = onSnapshot(projectsQuery, (snapshot) => {
+      setProjects(
+        snapshot.docs.map((projectDoc) => ({
+          id: projectDoc.id,
+          ...projectDoc.data(),
+        }))
+      );
+    });
+
+    return unsubscribe;
+  }, []);
+
   const resetForm = () => {
     setTitle("");
     setDueDate("");
     setPriority("medium");
     setStatus("todo");
+    setProjectId("");
     setEditingTaskId(null);
   };
 
@@ -58,6 +84,7 @@ function Tasks() {
       dueDate: dueDate || null,
       priority,
       status,
+      projectId: projectId || null,
       completed: status === "done",
     };
 
@@ -82,6 +109,7 @@ function Tasks() {
     setDueDate(task.dueDate || "");
     setPriority(task.priority || "medium");
     setStatus(task.status || (task.completed ? "done" : "todo"));
+    setProjectId(task.projectId || "");
 
     window.scrollTo({
       top: 0,
@@ -131,6 +159,80 @@ function Tasks() {
     });
   };
 
+  const getTodayString = () => {
+    const today = new Date();
+
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const getProjectName = (taskProjectId) => {
+    if (!taskProjectId) return null;
+
+    const project = projects.find(
+      (project) => project.id === taskProjectId
+    );
+
+    return project?.name || "Unknown Project";
+  };
+
+  const filteredTasks = useMemo(() => {
+    const today = getTodayString();
+
+    return tasks.filter((task) => {
+      const taskStatus =
+        task.status || (task.completed ? "done" : "todo");
+
+      let matchesView = true;
+
+      if (view === "today") {
+        matchesView = task.dueDate === today && taskStatus !== "done";
+      }
+
+      if (view === "upcoming") {
+        matchesView =
+          task.dueDate &&
+          task.dueDate > today &&
+          taskStatus !== "done";
+      }
+
+      if (view === "in-progress") {
+        matchesView = taskStatus === "in-progress";
+      }
+
+      if (view === "completed") {
+        matchesView = taskStatus === "done";
+      }
+
+      const matchesPriority =
+        priorityFilter === "all" || task.priority === priorityFilter;
+
+      const matchesStatus =
+        statusFilter === "all" || taskStatus === statusFilter;
+
+      const matchesProject =
+        projectFilter === "all" ||
+        (projectFilter === "none" && !task.projectId) ||
+        task.projectId === projectFilter;
+
+      return (
+        matchesView &&
+        matchesPriority &&
+        matchesStatus &&
+        matchesProject
+      );
+    });
+  }, [
+    tasks,
+    view,
+    priorityFilter,
+    statusFilter,
+    projectFilter,
+  ]);
+
   return (
     <>
       <header className="page-header">
@@ -163,6 +265,24 @@ function Tasks() {
               onChange={(event) => setTitle(event.target.value)}
               placeholder="What needs to get done?"
             />
+          </label>
+
+          <label>
+            Project
+            <select
+              value={projectId}
+              onChange={(event) => setProjectId(event.target.value)}
+            >
+              <option value="">No project</option>
+
+              {projects
+                .filter((project) => project.status !== "completed")
+                .map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.name}
+                  </option>
+                ))}
+            </select>
           </label>
 
           <label>
@@ -206,18 +326,108 @@ function Tasks() {
         </form>
 
         <div className="task-list-card">
-          <div className="card-header">
-            <h2>All Tasks</h2>
-            <span>{tasks.length} total</span>
+          <div className="task-toolbar">
+            <div className="task-views">
+              <button
+                type="button"
+                className={view === "all" ? "task-view active" : "task-view"}
+                onClick={() => setView("all")}
+              >
+                All
+              </button>
+
+              <button
+                type="button"
+                className={view === "today" ? "task-view active" : "task-view"}
+                onClick={() => setView("today")}
+              >
+                Today
+              </button>
+
+              <button
+                type="button"
+                className={
+                  view === "upcoming" ? "task-view active" : "task-view"
+                }
+                onClick={() => setView("upcoming")}
+              >
+                Upcoming
+              </button>
+
+              <button
+                type="button"
+                className={
+                  view === "in-progress" ? "task-view active" : "task-view"
+                }
+                onClick={() => setView("in-progress")}
+              >
+                In Progress
+              </button>
+
+              <button
+                type="button"
+                className={
+                  view === "completed" ? "task-view active" : "task-view"
+                }
+                onClick={() => setView("completed")}
+              >
+                Completed
+              </button>
+            </div>
+
+            <div className="task-filters">
+              <select
+                value={projectFilter}
+                onChange={(event) => setProjectFilter(event.target.value)}
+              >
+                <option value="all">All projects</option>
+                <option value="none">No project</option>
+
+                {projects.map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.name}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={priorityFilter}
+                onChange={(event) => setPriorityFilter(event.target.value)}
+              >
+                <option value="all">All priorities</option>
+                <option value="low">Low priority</option>
+                <option value="medium">Medium priority</option>
+                <option value="high">High priority</option>
+              </select>
+
+              <select
+                value={statusFilter}
+                onChange={(event) => setStatusFilter(event.target.value)}
+              >
+                <option value="all">All statuses</option>
+                <option value="todo">To Do</option>
+                <option value="in-progress">In Progress</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
           </div>
 
-          {tasks.length === 0 ? (
-            <p className="empty-state">No tasks yet.</p>
+          <div className="card-header task-list-header">
+            <h2>Tasks</h2>
+            <span>
+              {filteredTasks.length} of {tasks.length}
+            </span>
+          </div>
+
+          {filteredTasks.length === 0 ? (
+            <p className="empty-state">No tasks in this view.</p>
           ) : (
             <div className="task-list">
-              {tasks.map((task) => {
+              {filteredTasks.map((task) => {
                 const taskStatus =
                   task.status || (task.completed ? "done" : "todo");
+
+                const taskProjectName = getProjectName(task.projectId);
 
                 return (
                   <div
@@ -230,11 +440,6 @@ function Tasks() {
                       type="button"
                       className="task-check"
                       onClick={() => toggleTask(task)}
-                      aria-label={
-                        task.completed
-                          ? "Mark task incomplete"
-                          : "Mark task complete"
-                      }
                     >
                       {task.completed ? "✓" : ""}
                     </button>
@@ -243,6 +448,12 @@ function Tasks() {
                       <div className="task-title">{task.title}</div>
 
                       <div className="task-meta">
+                        {taskProjectName && (
+                          <span className="task-project">
+                            {taskProjectName}
+                          </span>
+                        )}
+
                         {task.dueDate && (
                           <span>Due {formatDate(task.dueDate)}</span>
                         )}

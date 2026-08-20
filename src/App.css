@@ -1,3 +1,75 @@
+:root {
+  --background: #f5f6f8;
+  --surface: #ffffff;
+  --surface-secondary: #f3f5f7;
+
+  --sidebar: #1d232b;
+  --sidebar-hover: #29313b;
+  --sidebar-active: #343e4a;
+
+  --text: #20242a;
+  --text-secondary: #717b87;
+  --text-muted: #8a929c;
+
+  --border: #e4e7eb;
+
+  --accent: #1d232b;
+  --accent-hover: #343e4a;
+  --accent-text: #ffffff;
+
+  --input-background: #ffffff;
+
+  --shadow: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="dark"] {
+  --background: #11151a;
+  --surface: #1b2027;
+  --surface-secondary: #232a32;
+
+  --sidebar: #0c0f13;
+  --sidebar-hover: #1c222a;
+  --sidebar-active: #29313b;
+
+  --text: #f2f4f6;
+  --text-secondary: #b3bbc5;
+  --text-muted: #89929e;
+
+  --border: #303842;
+
+  --accent: #d9dee5;
+  --accent-hover: #ffffff;
+  --accent-text: #171b20;
+
+  --input-background: #222830;
+
+  --shadow: rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="color"] {
+  --background: #eef2f7;
+  --surface: #ffffff;
+  --surface-secondary: #eef3f8;
+
+  --sidebar: #24364b;
+  --sidebar-hover: #304963;
+  --sidebar-active: #3d5d7d;
+
+  --text: #24303d;
+  --text-secondary: #657384;
+  --text-muted: #8593a2;
+
+  --border: #d8e0e8;
+
+  --accent: #3d6f99;
+  --accent-hover: #315f84;
+  --accent-text: #ffffff;
+
+  --input-background: #ffffff;
+
+  --shadow: rgba(46, 76, 104, 0.08);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -9,8 +81,8 @@ body {
 .app {
   min-height: 100vh;
   display: flex;
-  background: #f5f6f8;
-  color: #20242a;
+  background: var(--background);
+  color: var(--text);
   font-family: Inter, Arial, sans-serif;
 }
 
@@ -20,7 +92,7 @@ body {
   width: 240px;
   min-height: 100vh;
   padding: 32px 20px 24px;
-  background: #1d232b;
+  background: var(--sidebar);
   color: white;
 
   display: flex;
@@ -65,12 +137,12 @@ body {
 }
 
 .nav-item:hover {
-  background: #29313b;
+  background: var(--sidebar-hover);
   color: white;
 }
 
 .nav-item.active {
-  background: #343e4a;
+  background: var(--sidebar-active);
   color: white;
 }
 
@@ -381,4 +453,422 @@ body {
 
 .status-select--done {
   background: #e7f1e8;
+}
+
+.task-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.task-views {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.task-view {
+  border: 1px solid #d8dde3;
+  background: white;
+  color: #66717f;
+  padding: 7px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+}
+
+.task-view:hover {
+  background: #f3f5f7;
+}
+
+.task-view.active {
+  background: #1d232b;
+  border-color: #1d232b;
+  color: white;
+}
+
+.task-filters {
+  display: flex;
+  gap: 8px;
+}
+
+.task-filters select {
+  padding: 8px 10px;
+  border: 1px solid #d8dde3;
+  border-radius: 8px;
+  background: white;
+  font: inherit;
+  font-size: 12px;
+}
+
+.task-list-header {
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eceff2;
+}
+
+@media (max-width: 700px) {
+  .task-toolbar {
+    align-items: stretch;
+  }
+
+  .task-filters {
+    width: 100%;
+  }
+
+  .task-filters select {
+    flex: 1;
+  }
+}
+
+/* Projects */
+
+.project-layout {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.project-form,
+.project-list-card {
+  background: white;
+  border: 1px solid #e4e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.project-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.project-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.project-form input,
+.project-form textarea,
+.project-form select {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #d8dde3;
+  border-radius: 8px;
+  background: white;
+  font: inherit;
+}
+
+.project-form textarea {
+  resize: vertical;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.project-card {
+  padding: 18px;
+  border: 1px solid #e4e7eb;
+  border-radius: 10px;
+}
+
+.project-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.project-card h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.project-description {
+  margin: 16px 0 0;
+  color: #717b87;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.project-status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  text-transform: capitalize;
+}
+
+.project-status--active {
+  background: #e7f1e8;
+}
+
+.project-status--on-hold {
+  background: #f5f1e7;
+}
+
+.project-status--completed {
+  background: #edf0f3;
+}
+
+@media (max-width: 900px) {
+  .project-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .project-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.task-project {
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #edf0f5;
+  color: #586575;
+  font-weight: 600;
+}
+
+.project-title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.project-title-link:hover h3 {
+  text-decoration: underline;
+}
+
+.project-card-stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  font-size: 12px;
+  color: #7c8692;
+}
+
+.project-open-link {
+  display: inline-block;
+  margin-top: 16px;
+  color: #354252;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.project-open-link:hover {
+  text-decoration: underline;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 24px;
+  color: #657180;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.project-detail-header .project-status {
+  margin-top: 14px;
+}
+
+.project-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px;
+  background: white;
+  border: 1px solid #e4e7eb;
+  border-radius: 12px;
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #7c8692;
+}
+
+.project-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.project-section-card {
+  background: white;
+  border: 1px solid #e4e7eb;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.project-task-list {
+  margin-top: 18px;
+}
+
+.project-task-row {
+  padding: 14px 0;
+  border-bottom: 1px solid #eceff2;
+}
+
+.project-task-row:last-child {
+  border-bottom: none;
+}
+
+.project-task-row--complete {
+  color: #9aa1aa;
+  text-decoration: line-through;
+}
+
+@media (max-width: 800px) {
+
+  .project-stats,
+  .project-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Project Notes */
+
+.project-notes-section {
+  margin-top: 32px;
+}
+
+.project-notes-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.project-notes-header h2 {
+  margin: 0;
+}
+
+.project-notes-header span {
+  font-size: 12px;
+  color: #8a929c;
+}
+
+.project-notes-layout {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.note-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+  background: white;
+  border: 1px solid #e4e7eb;
+  border-radius: 12px;
+}
+
+.note-form h3 {
+  margin: 0;
+}
+
+.note-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.note-form input,
+.note-form textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #d8dde3;
+  border-radius: 8px;
+  background: white;
+  font: inherit;
+}
+
+.note-form textarea {
+  resize: vertical;
+}
+
+.project-notes-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.note-card {
+  padding: 20px;
+  background: white;
+  border: 1px solid #e4e7eb;
+  border-radius: 12px;
+}
+
+.note-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.note-card h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.note-content {
+  margin: 16px 0 0;
+  color: #596675;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 900px) {
+  .project-notes-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .project-notes-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dashboard-card,
+.task-form,
+.task-list-card,
+.project-form,
+.project-list-card,
+.project-section-card,
+.note-form,
+.note-card,
+.stat-card {
+  background: var(--surface);
+  border-color: var(--border);
 }
