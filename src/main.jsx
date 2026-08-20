@@ -1,5 +1,11 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import {
+  StrictMode,
+} from "react";
+
+import {
+  createRoot,
+} from "react-dom/client";
+
 import {
   BrowserRouter,
 } from "react-router-dom";
@@ -11,6 +17,10 @@ import App from "./App.jsx";
 import {
   GoogleCalendarProvider,
 } from "./context/GoogleCalendarContext.jsx";
+
+import {
+  OutlookCalendarProvider,
+} from "./context/OutlookCalendarContext.jsx";
 
 const savedTheme =
   localStorage.getItem(
@@ -28,7 +38,9 @@ createRoot(
   <StrictMode>
     <BrowserRouter>
       <GoogleCalendarProvider>
-        <App />
+        <OutlookCalendarProvider>
+          <App />
+        </OutlookCalendarProvider>
       </GoogleCalendarProvider>
     </BrowserRouter>
   </StrictMode>
