@@ -24,6 +24,10 @@ import {
   useGoogleCalendar,
 } from "../context/GoogleCalendarContext";
 
+import {
+  getOutlookCalendarEvents,
+} from "../services/outlookCalendar";
+
 function Calendar() {
   const [
     view,
@@ -39,6 +43,21 @@ function Calendar() {
     events,
     setEvents,
   ] = useState([]);
+
+  const [
+    outlookEvents,
+    setOutlookEvents,
+  ] = useState([]);
+
+  const [
+    outlookLoading,
+    setOutlookLoading,
+  ] = useState(true);
+
+  const [
+    outlookError,
+    setOutlookError,
+  ] = useState(null);
 
   const [
     title,
@@ -105,6 +124,63 @@ function Calendar() {
   }, []);
 
   /*
+   * OUTLOOK ICS
+   */
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadOutlook =
+      async () => {
+        try {
+          setOutlookLoading(
+            true
+          );
+
+          setOutlookError(
+            null
+          );
+
+          const loadedEvents =
+            await getOutlookCalendarEvents();
+
+          if (!cancelled) {
+            setOutlookEvents(
+              loadedEvents
+            );
+          }
+        } catch (error) {
+          console.error(
+            "Unable to load Outlook calendar:",
+            error
+          );
+
+          if (!cancelled) {
+            setOutlookEvents(
+              []
+            );
+
+            setOutlookError(
+              error.message
+            );
+          }
+        } finally {
+          if (!cancelled) {
+            setOutlookLoading(
+              false
+            );
+          }
+        }
+      };
+
+    loadOutlook();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  /*
    * CMDC EVENT FORM
    */
 
@@ -129,9 +205,12 @@ function Calendar() {
       const eventData = {
         title:
           title.trim(),
+
         date,
+
         time:
           time || null,
+
         source:
           "CMDC",
       };
@@ -216,7 +295,7 @@ function Calendar() {
     };
 
   /*
-   * COMBINE CMDC + GOOGLE
+   * COMBINED EVENTS
    */
 
   const allEvents =
@@ -224,10 +303,12 @@ function Calendar() {
       return [
         ...events,
         ...googleEvents,
+        ...outlookEvents,
       ];
     }, [
       events,
       googleEvents,
+      outlookEvents,
     ]);
 
   const sortedEvents =
@@ -304,9 +385,14 @@ function Calendar() {
     ).toLocaleDateString(
       "en-US",
       {
-        weekday: "short",
-        month: "short",
-        day: "numeric",
+        weekday:
+          "short",
+
+        month:
+          "short",
+
+        day:
+          "numeric",
       }
     );
   };
@@ -334,8 +420,11 @@ function Calendar() {
     ).toLocaleTimeString(
       "en-US",
       {
-        hour: "numeric",
-        minute: "2-digit",
+        hour:
+          "numeric",
+
+        minute:
+          "2-digit",
       }
     );
   };
@@ -420,11 +509,12 @@ function Calendar() {
         i--
       ) {
         days.push({
-          date: new Date(
-            year,
-            month,
-            -i
-          ),
+          date:
+            new Date(
+              year,
+              month,
+              -i
+            ),
 
           currentMonth:
             false,
@@ -438,11 +528,12 @@ function Calendar() {
         day++
       ) {
         days.push({
-          date: new Date(
-            year,
-            month,
-            day
-          ),
+          date:
+            new Date(
+              year,
+              month,
+              day
+            ),
 
           currentMonth:
             true,
@@ -456,11 +547,12 @@ function Calendar() {
         days.length < 42
       ) {
         days.push({
-          date: new Date(
-            year,
-            month + 1,
-            nextMonthDay
-          ),
+          date:
+            new Date(
+              year,
+              month + 1,
+              nextMonthDay
+            ),
 
           currentMonth:
             false,
@@ -550,8 +642,11 @@ function Calendar() {
     currentDate.toLocaleDateString(
       "en-US",
       {
-        month: "long",
-        year: "numeric",
+        month:
+          "long",
+
+        year:
+          "numeric",
       }
     );
 
@@ -674,7 +769,7 @@ function Calendar() {
         <div className="calendar-main">
           <div className="calendar-toolbar">
             <div className="calendar-connections">
-              <div>
+              <div className="calendar-connection-group">
                 <button
                   type="button"
                   className={`calendar-connect-button ${
@@ -701,8 +796,7 @@ function Calendar() {
                     0 && (
                     <div className="google-calendar-picker">
                       <span className="google-calendar-picker-label">
-                        Google
-                        Calendars
+                        Google Calendars
                       </span>
 
                       <div className="google-calendar-options">
@@ -743,6 +837,23 @@ function Calendar() {
                       </div>
                     </div>
                   )}
+              </div>
+
+              <div className="calendar-connection-group">
+                <div
+                  className={`calendar-connect-button ${
+                    !outlookLoading &&
+                    !outlookError
+                      ? "calendar-connect-button--connected"
+                      : ""
+                  }`}
+                >
+                  {outlookLoading
+                    ? "Loading Outlook..."
+                    : outlookError
+                      ? "Outlook unavailable"
+                      : `Outlook Connected (${outlookEvents.length})`}
+                </div>
               </div>
             </div>
 
@@ -800,6 +911,18 @@ function Calendar() {
             </div>
           </div>
 
+          {outlookError && (
+            <div className="calendar-error">
+              <strong>
+                Outlook calendar could not be loaded.
+              </strong>
+
+              <span>
+                {outlookError}
+              </span>
+            </div>
+          )}
+
           {view ===
             "calendar" && (
             <section className="month-calendar">
@@ -847,27 +970,13 @@ function Calendar() {
               </div>
 
               <div className="calendar-weekdays">
-                <div>
-                  Sun
-                </div>
-                <div>
-                  Mon
-                </div>
-                <div>
-                  Tue
-                </div>
-                <div>
-                  Wed
-                </div>
-                <div>
-                  Thu
-                </div>
-                <div>
-                  Fri
-                </div>
-                <div>
-                  Sat
-                </div>
+                <div>Sun</div>
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div>Sat</div>
               </div>
 
               <div className="calendar-grid">
@@ -984,8 +1093,7 @@ function Calendar() {
               {upcomingEvents.length ===
               0 ? (
                 <p className="empty-state">
-                  No upcoming
-                  events.
+                  No upcoming events.
                 </p>
               ) : (
                 <div className="calendar-event-list">
