@@ -1,13 +1,35 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import {
+  BrowserRouter,
+} from "react-router-dom";
+
 import "./styles/index.css";
+
 import App from "./App.jsx";
 
-createRoot(document.getElementById("root")).render(
+import {
+  GoogleCalendarProvider,
+} from "./context/GoogleCalendarContext.jsx";
+
+const savedTheme =
+  localStorage.getItem(
+    "cmdc-theme"
+  ) || "light";
+
+document.documentElement.setAttribute(
+  "data-theme",
+  savedTheme
+);
+
+createRoot(
+  document.getElementById("root")
+).render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <GoogleCalendarProvider>
+        <App />
+      </GoogleCalendarProvider>
     </BrowserRouter>
-  </StrictMode>,
+  </StrictMode>
 );
